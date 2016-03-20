@@ -23,8 +23,8 @@ extern "C" {
 #define DEFAULT_DISPLAY_NUMBER 0
 
 uint32_t displayNumber = DEFAULT_DISPLAY_NUMBER;
-VC_IMAGE_TYPE_T imageType = VC_IMAGE_RGB888;
-int8_t dmxBytesPerPixel  = 3;
+VC_IMAGE_TYPE_T imageType = VC_IMAGE_RGBA32;
+int8_t dmxBytesPerPixel  = 4;
 DISPMANX_DISPLAY_HANDLE_T displayHandle;
 DISPMANX_MODEINFO_T modeInfo;
 DISPMANX_RESOURCE_HANDLE_T resourceHandle;
@@ -45,8 +45,8 @@ void send_leds();
 bool update_image() {
   //fprintf(stderr, "update_image\n");
   int  result = vc_dispmanx_snapshot(displayHandle,
-				     resourceHandle,
-				     DISPMANX_NO_ROTATE);
+  			     resourceHandle,
+  			     DISPMANX_NO_ROTATE);
   if (result != 0) {
     vc_dispmanx_resource_delete(resourceHandle);
     vc_dispmanx_display_close(displayHandle);
@@ -55,51 +55,51 @@ bool update_image() {
     exit(EXIT_FAILURE);
   }
 
-    VC_RECT_T rect;
-    result = vc_dispmanx_rect_set(&rect, 0, 0, width, height);
+  VC_RECT_T rect;
+  result = vc_dispmanx_rect_set(&rect, 0, 0, width, height);
 
-    if (result != 0)
-    {
-        vc_dispmanx_resource_delete(resourceHandle);
-        vc_dispmanx_display_close(displayHandle);
+  if (result != 0)
+  {
+      vc_dispmanx_resource_delete(resourceHandle);
+      vc_dispmanx_display_close(displayHandle);
 
-        fprintf(stderr,
-                "vc_dispmanx_resource_read_data() failed\n");
-        exit(EXIT_FAILURE);
-    }
+      fprintf(stderr,
+              "vc_dispmanx_resource_read_data() failed\n");
+      exit(EXIT_FAILURE);
+  }
 
-    result = vc_dispmanx_resource_read_data(resourceHandle,
-                                            &rect,
-                                            dmxImagePtr,
-                                            dmxPitch);
+  result = vc_dispmanx_resource_read_data(resourceHandle,
+                                          &rect,
+                                          dmxImagePtr,
+                                          dmxPitch);
 
-  
-    if (result != 0)
-    {
-        vc_dispmanx_resource_delete(resourceHandle);
-        vc_dispmanx_display_close(displayHandle);
 
-        fprintf(stderr,
-                "vc_dispmanx_resource_read_data() failed\n");
+  if (result != 0)
+  {
+      vc_dispmanx_resource_delete(resourceHandle);
+      vc_dispmanx_display_close(displayHandle);
 
-        exit(EXIT_FAILURE);
-    }
-    send_leds();
+      fprintf(stderr,
+              "vc_dispmanx_resource_read_data() failed\n");
 
-    IMAGE_T *image = &(ledLayer.image);
-    std::vector<uint8_t> data(matrix.leds.size() * 3, 0);
-    for (std::vector<Point>::iterator it = matrix.leds.begin() ; it != matrix.leds.end(); ++it) {
-      Point led = *it;
-      unsigned char* pixel = (unsigned char*)dmxImagePtr + led.y * width * dmxBytesPerPixel + led.x * dmxBytesPerPixel;
-      
-      RGBA8_T colour = { pixel[0], pixel[1], pixel[2], 255 };
-     
-      setPixelRGB(image, led.x/scale, led.y/scale, &colour);
-    }
+      exit(EXIT_FAILURE);
+  }
+  send_leds();
 
-    changeSourceAndUpdateImageLayer(&ledLayer);
+  IMAGE_T *image = &(ledLayer.image);
+  std::vector<uint8_t> data(matrix.leds.size() * 3, 0);
+  for (std::vector<Point>::iterator it = matrix.leds.begin() ; it != matrix.leds.end(); ++it) {
+    Point led = *it;
+    unsigned char* pixel = (unsigned char*)dmxImagePtr + led.y * width * dmxBytesPerPixel + led.x * dmxBytesPerPixel;
     
-    return true;
+    RGBA8_T colour = { pixel[0], pixel[1], pixel[2], 255 };
+   
+    setPixelRGB(image, led.x/scale, led.y/scale, &colour);
+  }
+
+  changeSourceAndUpdateImageLayer(&ledLayer);
+
+  return true;
 }
 
 void send_leds() {
@@ -155,14 +155,18 @@ main (int    argc,
 					       width,
 					       height,
 					       &vcImagePtr);
-  initBackgroundLayer(&bg, 0x000F, 0);
+  initBackgroundLayer(&bg, 0x0000, 0);
   
   initImageLayer(&ledLayer,
 		 width / scale,
 		 height /scale,
-		 VC_IMAGE_RGB888);
+		 VC_IMAGE_RGBA32);
+  RGBA8_T colour = { 0, 0, 0, 255 };
+  clearImageRGB(
+    &(ledLayer.image),
+    &colour);
   createResourceImageLayer(&ledLayer, 1);
-  
+
   DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
   assert(update != 0);
   
