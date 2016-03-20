@@ -31,7 +31,6 @@ DISPMANX_RESOURCE_HANDLE_T resourceHandle;
 void *dmxImagePtr;
 int32_t dmxPitch;
 
-BACKGROUND_LAYER_T bg;
 IMAGE_LAYER_T ledLayer;
 
 
@@ -155,7 +154,6 @@ main (int    argc,
 					       width,
 					       height,
 					       &vcImagePtr);
-  initBackgroundLayer(&bg, 0x0000, 0);
   
   initImageLayer(&ledLayer,
 		 width / scale,
@@ -169,8 +167,6 @@ main (int    argc,
 
   DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
   assert(update != 0);
-  
-  addElementBackgroundLayer(&bg, displayHandle, update);
   
   addElementImageLayerOffset(&ledLayer,
 			     0,
