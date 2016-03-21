@@ -1,6 +1,8 @@
 # Candy Pusher
 Reads from the video subsystem on your Raspberry pi to send pixel values to Fade Candy
 
+![Screenshot](https://raw.githubusercontent.com/cconstantine/candy_pusher/master/examples/snapshot.png)
+
 ## Buildin' run
 
 ```
