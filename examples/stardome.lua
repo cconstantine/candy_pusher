@@ -1,4 +1,4 @@
-local candy = Candy("stardome.local")
+local candy = Candy("localhost")
 
 local width = 800
 local height = 480
