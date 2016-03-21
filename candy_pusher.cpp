@@ -4,7 +4,6 @@
 #include <thread>
 #include "LedMatrix.h"
 #include "opc_client.h"
-
 #include "bcm_host.h"
 
 extern "C" {
@@ -38,8 +37,6 @@ int width;
 int height;
 int scale = 4;
 
-LedMatrix matrix;
-OPCClient opc_client;
 void send_leds();
 bool update_image() {
   //fprintf(stderr, "update_image\n");
@@ -86,14 +83,17 @@ bool update_image() {
   send_leds();
 
   IMAGE_T *image = &(ledLayer.image);
-  std::vector<uint8_t> data(matrix.leds.size() * 3, 0);
-  for (std::vector<Point>::iterator it = matrix.leds.begin() ; it != matrix.leds.end(); ++it) {
-    Point led = *it;
-    unsigned char* pixel = (unsigned char*)dmxImagePtr + led.y * width * dmxBytesPerPixel + led.x * dmxBytesPerPixel;
-    
-    RGBA8_T colour = { pixel[0], pixel[1], pixel[2], 255 };
-   
-    setPixelRGB(image, led.x/scale, led.y/scale, &colour);
+  for(std::vector<LedMatrix*>::iterator mx = LedMatrix::matrices.begin(); mx != LedMatrix::matrices.end();++mx) {
+    LedMatrix *matrix = *mx;
+    std::vector<uint8_t> data(matrix->leds.size() * 3, 0);
+    for (std::vector<Point>::iterator it = matrix->leds.begin() ; it != matrix->leds.end(); ++it) {
+      Point led = *it;
+      unsigned char* pixel = (unsigned char*)dmxImagePtr + led.y * width * dmxBytesPerPixel + led.x * dmxBytesPerPixel;
+
+      RGBA8_T colour = { pixel[0], pixel[1], pixel[2], 255 };
+
+      setPixelRGB(image, led.x/scale, led.y/scale, &colour);
+    }
   }
 
   changeSourceAndUpdateImageLayer(&ledLayer);
@@ -103,16 +103,19 @@ bool update_image() {
 
 void send_leds() {
   //fprintf(stderr, "send_leds\n");
-  std::vector<uint8_t> data(matrix.leds.size() * 3, 0);
-  for (std::vector<Point>::iterator it = matrix.leds.begin() ; it != matrix.leds.end(); ++it) {
-    Point led = *it;
-    unsigned char* pixel = (unsigned char*)dmxImagePtr + led.y * width * dmxBytesPerPixel + led.x * dmxBytesPerPixel;
-    
-    data.push_back(pixel[0]);
-    data.push_back(pixel[1]);
-    data.push_back(pixel[2]);
+  for(std::vector<LedMatrix*>::iterator mx = LedMatrix::matrices.begin(); mx != LedMatrix::matrices.end();++mx) {
+    LedMatrix *matrix = *mx;
+    std::vector<uint8_t> data(matrix->leds.size() * 3, 0);
+    for (std::vector<Point>::iterator it = matrix->leds.begin() ; it != matrix->leds.end(); ++it) {
+      Point led = *it;
+      unsigned char* pixel = (unsigned char*)dmxImagePtr + led.y * width * dmxBytesPerPixel + led.x * dmxBytesPerPixel;
+
+      data.push_back(pixel[0]);
+      data.push_back(pixel[1]);
+      data.push_back(pixel[2]);
+    }
+    matrix->opc_client.write(data);
   }
-  opc_client.write(data);
 }
 
 
@@ -177,51 +180,7 @@ main (int    argc,
   result = vc_dispmanx_update_submit_sync(update);
   assert(result == 0);
 
-  int x = width / 2;
-  int y = height / 2;
-  
-  float scale_factor = y / 7.8;
-  Point pos_0 = Point(x	     , y      );
-  
-  Point pos_1 = Point(x + scale_factor *  3.917, y + scale_factor *  1.272);
-  Point pos_2 = Point(x + scale_factor *  0    , y + scale_factor *  4.118);
-  Point pos_3 = Point(x + scale_factor * -3.917, y + scale_factor *  1.272);
-  Point pos_4 = Point(x + scale_factor * -2.421, y + scale_factor * -3.332);
-  Point pos_5 = Point(x + scale_factor *  2.421, y + scale_factor * -3.332);
-  
-  Point pos_6 = Point(x + scale_factor *  4.423, y + scale_factor *  6.088);
-  Point pos_7 = Point(x + scale_factor * -4.423, y + scale_factor *  6.088);
-  Point pos_8 = Point(x + scale_factor * -7.157, y + scale_factor * -2.325);
-  Point pos_9 = Point(x + scale_factor *  0    , y + scale_factor * -7.526);
-  Point pos_A = Point(x + scale_factor *  7.157, y + scale_factor * -2.325);
-  
-  matrix.add_strip(pos_1, pos_0, 70);
-  matrix.add_strip(pos_1, pos_2, 82);
-  matrix.add_strip(pos_1, pos_A, 84);
-  matrix.add_strip(pos_1, pos_6, 84);
-  
-  matrix.add_strip(pos_2, pos_0, 70);
-  matrix.add_strip(pos_2, pos_3, 82);
-  matrix.add_strip(pos_2, pos_7, 84);
-  matrix.add_strip(pos_2, pos_6, 84);
-  
-  
-  matrix.add_strip(pos_3, pos_0, 70);
-  matrix.add_strip(pos_3, pos_4, 82);
-  matrix.add_strip(pos_3, pos_8, 84);
-  matrix.add_strip(pos_3, pos_7, 84);
-  
-  matrix.add_strip(pos_4, pos_0, 70);
-  matrix.add_strip(pos_4, pos_5, 82);
-  matrix.add_strip(pos_4, pos_9, 84);
-  matrix.add_strip(pos_4, pos_8, 84);
-  
-  matrix.add_strip(pos_5, pos_0, 70);
-  matrix.add_strip(pos_5, pos_1, 82);
-  matrix.add_strip(pos_5, pos_9, 84);
-  matrix.add_strip(pos_5, pos_A, 84);
-  
-  opc_client.resolve("stardome.local");
+  LedMatrix::load_lua(argv[1]);
 
   while(true) {
     std::chrono::steady_clock::time_point nextFrame =

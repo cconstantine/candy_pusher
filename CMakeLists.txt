@@ -2,13 +2,15 @@
 project(candy_pusher)
 
 # Set the minimum version of cmake required to build this project
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.0)
 # Use the package PkgConfig to detect GTK+ headers/library files
+include(FindLua)
 
 include_directories(/opt/vc/include)
 include_directories(/opt/vc/include/interface/vcos/pthreads)
 include_directories(/opt/vc/include/interface/vmcs_host)
 include_directories(/opt/vc/include/interface/vmcs_host/linux)
+include_directories(${LUA_INCLUDE_DIR})
 
 link_directories(/opt/vc/lib)
 
@@ -21,4 +23,4 @@ add_library(common STATIC  common/imageLayer.c common/image.c common/imageKey.c 
 add_executable(candy_pusher candy_pusher.cpp LedMatrix.cpp )
 
 # Link the target to the GTK+ libraries
-target_link_libraries(candy_pusher bcm_host common)
+target_link_libraries(candy_pusher bcm_host common ${LUA_LIBRARIES})

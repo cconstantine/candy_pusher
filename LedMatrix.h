@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include "opc_client.h"
+
 class Point
 {
 public:
@@ -14,13 +16,17 @@ public:
 class LedMatrix
 {
 public:
+	LedMatrix(const char * hostname);
     virtual ~LedMatrix()  {}
 
     void add_strip(Point start, Point end, unsigned int length);
 
-
     // Hold the Position of our Capture points
     std::vector <Point> leds;
+	OPCClient opc_client;
+
+    static void load_lua(const char* filename);
+    static std::vector<LedMatrix*> matrices;
 };
 
 
