@@ -84,7 +84,6 @@ gboolean update_image_gtk(gpointer data)
 void
 activate (GtkApplication* app, gpointer user_data) {
   GtkDriver * driver = (GtkDriver*)user_data;
-  printf("activate: %x\n", driver);
 
   GtkWidget *window;
 
@@ -101,7 +100,6 @@ activate (GtkApplication* app, gpointer user_data) {
   gtk_widget_override_background_color(window, GTK_STATE_FLAG_NORMAL, &black);
 
   driver->image = gtk_drawing_area_new ();
- // g_signal_connect (driver->image, "draw", G_CALLBACK (draw_leds_gtk), (gpointer)this);
   g_signal_connect (driver->image, "draw", G_CALLBACK (draw_leds_gtk), (gpointer)driver);
 
   gtk_container_add (GTK_CONTAINER (window), driver->image);
@@ -119,6 +117,4 @@ void GtkDriver::go(int argc, char** argv) {
 
   status = g_application_run (G_APPLICATION (app), 1, argv);
   g_object_unref (app);
-
-  printf("Done with go: %d\n", status);
 }
