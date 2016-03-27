@@ -3,9 +3,15 @@
 
 class AbstractDriver {
 public:
-  inline AbstractDriver() {};
+  inline AbstractDriver(int argc, char** argv) : argc(argc), argv(argv) {};
 
-  virtual void go(int argc, char** argv) = 0;
+  virtual void go() = 0;
+
+  virtual int getWidth() = 0;
+  virtual int getHeight() = 0;
+  
+  int argc;
+  char** argv;
 };
 
 #endif

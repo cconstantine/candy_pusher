@@ -4,7 +4,7 @@
 #include "LedMatrix.h"
 
 
-GtkDriver::GtkDriver() : scale(4), gpb(NULL) { }
+GtkDriver::GtkDriver(int argc, char** argv) : AbstractDriver(argc, argv), scale(4), gpb(NULL) { }
 
 
 void GtkDriver::send_leds() {
@@ -64,6 +64,14 @@ void GtkDriver::draw_leds(GtkWidget *widget, cairo_t *cr) {
 }
 
 
+int GtkDriver::getWidth() {
+  return width;
+}
+
+int GtkDriver::getHeight() {
+  return height;
+}
+  
 gboolean
 draw_leds_gtk(GtkWidget *widget, cairo_t *cr, gpointer data)
 {
@@ -105,15 +113,18 @@ activate (GtkApplication* app, gpointer user_data) {
   gtk_container_add (GTK_CONTAINER (window), driver->image);
   gtk_widget_show_all (window);
 
+
+  LedMatrix::load_lua(driver->argv[1], driver);
 }
 
-void GtkDriver::go(int argc, char** argv) {
+void GtkDriver::go() {
   GtkApplication *app;
   int status;
 
   app = gtk_application_new ("org.gtk.example", G_APPLICATION_FLAGS_NONE);
   g_signal_connect (app, "activate", G_CALLBACK (activate), (gpointer)this);
   g_timeout_add (1000/30, update_image_gtk, (gpointer)this);
+
 
   status = g_application_run (G_APPLICATION (app), 1, argv);
   g_object_unref (app);

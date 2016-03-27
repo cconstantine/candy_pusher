@@ -5,8 +5,6 @@
 int main (int    argc,
       char **argv)
 {
-  LedMatrix::load_lua(argv[1]);
-
-  GtkDriver driver = GtkDriver();
-  driver.go(argc, argv);
+  GtkDriver driver = GtkDriver(argc, argv);
+  driver.go();
 }

@@ -14,7 +14,8 @@
 #define DEFAULT_DELAY 0
 #define DEFAULT_DISPLAY_NUMBER 0
 
-RpiDriver::RpiDriver() :
+RpiDriver::RpiDriver(int argc, char** argv) :
+  AbstractDriver(argc, argv), 
   displayNumber(DEFAULT_DISPLAY_NUMBER),
   imageType(VC_IMAGE_RGBA32),
   dmxBytesPerPixel( 4),
@@ -144,9 +145,17 @@ void RpiDriver::update_image() {
   changeSourceAndUpdateImageLayer(&ledLayer);
 }
 
+int RpiDriver::getWidth() {
+  return width;
+}
 
-void RpiDriver::go(int argc, char** argv) {
+int RpiDriver::getHeight() {
+  return height;
+}
+  
 
+void RpiDriver::go() {
+  LedMatrix::load_lua(argv[1], this);
   while(true) {
     std::chrono::steady_clock::time_point nextFrame =
       std::chrono::steady_clock::now() + std::chrono::milliseconds(1000/30);

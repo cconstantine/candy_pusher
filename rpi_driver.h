@@ -12,10 +12,13 @@ extern "C" {
 
 class RpiDriver : public AbstractDriver {
 public:
-  RpiDriver();
+  RpiDriver(int argc, char** argv);
 
-  virtual void go(int argc, char** argv);
+  virtual void go();
 
+  virtual int getWidth();
+  virtual int getHeight();
+  
 private:
   void update_image();
   

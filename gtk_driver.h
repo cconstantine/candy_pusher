@@ -8,11 +8,14 @@
 
 class GtkDriver : public AbstractDriver {
 public:
-  GtkDriver();
+  GtkDriver(int argc, char** argv);
 
-  virtual void go(int argc, char** argv);
+  virtual void go();
   void update_image();
   void draw_leds(GtkWidget *widget, cairo_t *cr);
+
+  virtual int getWidth();
+  virtual int getHeight();
 
   GtkWidget *image;
 

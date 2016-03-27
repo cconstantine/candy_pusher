@@ -1,7 +1,7 @@
 local candy = Candy("localhost")
 
-local width = 800
-local height = 480
+local width = candy:get_width()
+local height = candy:get_height()
 
 local x = width / 2
 local y = height / 2

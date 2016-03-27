@@ -18,8 +18,6 @@ link_directories(${LUA_LIBRARY_DIRS})
 set(CMAKE_CXX_FLAGS "-std=c++11" )
 add_definitions(${LUA_CFLAGS_OTHER})
 
-add_library(common STATIC LedMatrix.cpp)
-
 if(EXISTS /opt/vc/include/bcm_host.h)
 	include_directories(/opt/vc/include)
 	include_directories(/opt/vc/include/interface/vcos/pthreads)
@@ -30,10 +28,9 @@ if(EXISTS /opt/vc/include/bcm_host.h)
 
 	add_library(rpi_driver STATIC  rpi_driver.cpp common/imageLayer.c common/image.c  common/backgroundLayer.c )
 
-	add_executable(candy_pusher_rpi candy_pusher_rpi.cpp )
+	add_executable(candy_pusher_rpi candy_pusher_rpi.cpp LedMatrix.cpp candy.cpp)
 
 	target_link_libraries(candy_pusher_rpi
-	 common
 	 rpi_driver
 	 bcm_host
 	 ${LUA_LIBRARIES} 
@@ -45,10 +42,9 @@ if(GTK3_FOUND)
 	link_directories(${GTK3_LIBRARY_DIRS})
 	add_definitions(${GTK3_CFLAGS_OTHER})
 
-	add_executable(candy_pusher     candy_pusher.cpp gtk_driver.cpp)
+	add_executable(candy_pusher     candy_pusher.cpp gtk_driver.cpp LedMatrix.cpp candy.cpp)
 
 	target_link_libraries(candy_pusher
-	 common
 	 ${LUA_LIBRARIES}
 	 ${GTK3_LIBRARIES}
 	 )
