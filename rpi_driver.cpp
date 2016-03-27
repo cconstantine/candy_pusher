@@ -7,14 +7,6 @@
 #include "opc_client.h"
 #include "rpi_driver.h"
 
-extern "C" {
-#include "common/backgroundLayer.h"
-#include "common/font.h"
-#include "common/imageGraphics.h"
-#include "common/imageLayer.h"
-#include "common/key.h"
-}
-
 #ifndef ALIGN_TO_16
 #define ALIGN_TO_16(x)  ((x + 15) & ~15)
 #endif

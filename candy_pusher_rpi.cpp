@@ -1,5 +1,5 @@
 #include "LedMatrix.h"
-#include "gtk_driver.h"
+#include "rpi_driver.h"
 
 
 int main (int    argc,
@@ -7,6 +7,6 @@ int main (int    argc,
 {
   LedMatrix::load_lua(argv[1]);
 
-  GtkDriver driver = GtkDriver();
+  RpiDriver driver = RpiDriver();
   driver.go(argc, argv);
 }

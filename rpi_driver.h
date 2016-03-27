@@ -7,10 +7,7 @@
 
 extern "C" {
 #include "common/backgroundLayer.h"
-#include "common/font.h"
-#include "common/imageGraphics.h"
 #include "common/imageLayer.h"
-#include "common/key.h"
 }
 
 class RpiDriver : public AbstractDriver {
