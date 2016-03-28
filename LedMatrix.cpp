@@ -12,7 +12,6 @@ void LedMatrix::load_lua(const char* filename, AbstractDriver *driver) {
 
   Luna<Candy>::Register(L);
 
-  printf("driver: %p\n", driver);
   Candy::driver = driver;
   int s = luaL_loadfile(L, filename);
 

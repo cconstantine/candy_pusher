@@ -23,9 +23,11 @@ private:
   void update_image();
   
   uint32_t displayNumber;
+  uint32_t destinationDisplayNumber;
   VC_IMAGE_TYPE_T imageType;
   int8_t dmxBytesPerPixel;
   DISPMANX_DISPLAY_HANDLE_T displayHandle;
+  DISPMANX_DISPLAY_HANDLE_T ledDisplayHandle;
   DISPMANX_MODEINFO_T modeInfo;
   DISPMANX_RESOURCE_HANDLE_T resourceHandle;
   void *dmxImagePtr;
