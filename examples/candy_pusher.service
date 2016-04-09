@@ -1,0 +1,8 @@
+[Unit]
+Description=Copy Raspberry Pi screen fadecandy
+
+[Service]
+ExecStart=/home/pi/candy_pusher/build/candy_pusher_rpi -d 5 /home/pi/candy_pusher/examples/stardome_2016.lua
+
+[Install]
+WantedBy=multi-user.target
