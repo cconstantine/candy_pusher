@@ -7,6 +7,7 @@
 
 void LedMatrix::load_lua(const char* filename, AbstractDriver *driver) {
   lua_State *L = luaL_newstate();
+  luaL_requiref(L, "base", luaopen_base, 1);
   luaL_requiref(L, "io", luaopen_io, 1);
   luaL_requiref(L, "math", luaopen_math, 1);
 
