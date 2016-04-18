@@ -14,15 +14,16 @@ void GtkDriver::send_leds() {
 
   for(std::vector<LedMatrix*>::iterator mx = LedMatrix::matrices.begin(); mx != LedMatrix::matrices.end();++mx) {
     LedMatrix *matrix = *mx;
-    std::vector<uint8_t> data(matrix->leds.size() * 3, 0);
+
+    uint8_t *data = OPCClient::Header::view(matrix->frameBuffer).data();
     for (std::vector<Point>::iterator it = matrix->leds.begin() ; it != matrix->leds.end(); ++it) {
       Point led = *it;
       guchar* pixel = pixels + led.y * rowstride + led.x * channels;
-      data.push_back(pixel[0]);
-      data.push_back(pixel[1]);
-      data.push_back(pixel[2]);
+      *(data++) = pixel[0];
+      *(data++) = pixel[1];
+      *(data++) = pixel[2];
     }
-    matrix->opc_client.write(data);
+    matrix->opc_client.write(matrix->frameBuffer);
   }
 }
 

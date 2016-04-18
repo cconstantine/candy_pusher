@@ -30,10 +30,17 @@ void LedMatrix::load_lua(const char* filename, AbstractDriver *driver) {
   std::cerr << std::endl;
 
   lua_close(L);
+
+  for(std::vector<LedMatrix*>::iterator mx = LedMatrix::matrices.begin(); mx != LedMatrix::matrices.end();++mx) {
+    LedMatrix *matrix = *mx;
+    matrix->finalize();
+  }
 }
+
 
 LedMatrix::LedMatrix(const char * hostname) {
   opc_client.resolve(hostname);
+
 }
 
 
@@ -52,5 +59,11 @@ void LedMatrix::add_strip(Point start, Point end, unsigned int length)
 
 }
 
+void LedMatrix::finalize() {
+  int frameBytes = leds.size() * 3;
+  frameBuffer.resize(sizeof(OPCClient::Header) + frameBytes);
+
+  OPCClient::Header::view(frameBuffer).init(0, opc_client.SET_PIXEL_COLORS, frameBytes);
+}
 
 std::vector<LedMatrix*> LedMatrix::matrices;

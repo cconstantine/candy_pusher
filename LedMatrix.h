@@ -21,12 +21,14 @@ public:
     virtual ~LedMatrix()  {}
 
     void add_strip(Point start, Point end, unsigned int length);
+    void finalize();
 
     int getWidth();
     int getHeight();
 
     // Hold the Position of our Capture points
     std::vector <Point> leds;
+    std::vector<uint8_t> frameBuffer;
     OPCClient opc_client;
 
     static void load_lua(const char* filename, AbstractDriver *driver);
